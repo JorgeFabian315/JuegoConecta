@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Data.Common;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -26,7 +27,6 @@ namespace JuegoConecta
 
             CrearTablero(Columnas, Filas);
         }
-
 
         public void CrearTablero(int columnas, int filas)
         {
@@ -67,7 +67,8 @@ namespace JuegoConecta
                         Width = 55,
                         Height = 55,
                         Background = Brushes.White,
-                        Tag = "ficha"
+                        Tag = "ficha",
+                       
                     };
 
                     Grid.SetColumn(border, i);
@@ -96,7 +97,7 @@ namespace JuegoConecta
                 tablero.Children.Add(borderColumna);
             }
         }
-
+ 
         private Style CrearEstiloColumnas()
         {
 
@@ -155,21 +156,23 @@ namespace JuegoConecta
             Point clickPosition = e.GetPosition(tablero);
             int column = (int)(clickPosition.X / (tablero.ActualWidth / Columnas));
 
-
+            ColocarFicha(column);
+        }
+        private void ColocarFicha(int columna)
+        {
             var ultimaFicha = tablero.Children.OfType<Border>()
-                .Where(ficha => ficha.Background == Brushes.White
-                        && (string)ficha.Tag == "ficha"
-                        && Grid.GetColumn(ficha) == column)
-                .LastOrDefault();
+              .Where(ficha => ficha.Background == Brushes.White
+                      && (string)ficha.Tag == "ficha"
+                      && Grid.GetColumn(ficha) == columna)
+              .LastOrDefault();
 
-            SolidColorBrush color = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#DF474D")); // Naranja
-
+            SolidColorBrush color = new ((Color)ColorConverter.ConvertFromString("#DF474D")); // Naranja
 
             bool seguirJugando = tablero.Children.OfType<Border>()
-                .Any(ficha =>  (string)ficha.Tag == "ficha"
+                .Any(ficha => (string)ficha.Tag == "ficha"
                            && ficha.Background == Brushes.White);
 
-            if(!seguirJugando)
+            if (!seguirJugando)
             {
                 MessageBox.Show("Fin del juego");
                 CrearTablero(Columnas, Filas);
@@ -198,8 +201,8 @@ namespace JuegoConecta
             ultimaFicha.BorderBrush = Brushes.Black;
             ultimaFicha.BorderThickness = new Thickness(2);
             ultimaFicha.Background = color;
-        }
 
+        }
 
 
     }
