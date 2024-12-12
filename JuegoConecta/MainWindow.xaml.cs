@@ -59,24 +59,6 @@ namespace JuegoConecta
 
             for (int i = 0; i < columnas; i++)
             {
-                var borderColumna = new Border()
-                {
-
-                    Style = styleColumna,
-
-                };
-
-                if(i == 0)
-                    borderColumna.CornerRadius = new CornerRadius(10, 0, 0, 10);
-                else if (i == columnas - 1)
-                    borderColumna.CornerRadius = new CornerRadius(0, 10, 10, 0);
-
-
-                Grid.SetColumn(borderColumna, i);
-                Grid.SetRowSpan(borderColumna, filas);
-
-                tablero.Children.Add(borderColumna);
-
                 for (int j = 0; j < filas; j++)
                 {
                     var border = new Border()
@@ -94,6 +76,24 @@ namespace JuegoConecta
 
                     tablero.Children.Add(border);
                 }
+
+                var borderColumna = new Border()
+                {
+
+                    Style = styleColumna,
+
+                };
+
+                if (i == 0)
+                    borderColumna.CornerRadius = new CornerRadius(20, 0, 0, 20);
+                else if (i == columnas - 1)
+                    borderColumna.CornerRadius = new CornerRadius(0, 20, 20, 0);
+
+
+                Grid.SetColumn(borderColumna, i);
+                Grid.SetRowSpan(borderColumna, filas);
+
+                tablero.Children.Add(borderColumna);
             }
         }
 
@@ -115,9 +115,8 @@ namespace JuegoConecta
 
             ColorAnimation colorAnimation = new ColorAnimation
             {
-                From = colorBlack,   // Color inicial
                 To = colorGris,     // Color final
-                Duration = new Duration(TimeSpan.FromSeconds(0.4)) // Duración de 0.4s
+                Duration = new Duration(TimeSpan.FromSeconds(0.3)) // Duración de 0.4s
             };
 
             // Crear un Storyboard y vincular la animación
@@ -130,8 +129,8 @@ namespace JuegoConecta
 
             ColorAnimation exitAnimation = new ColorAnimation
             {
-                To = colorBlack, // Volver al color original
-                Duration = new Duration(TimeSpan.FromSeconds(0.2))
+                To = Colors.Transparent, // Volver al color original
+                Duration = new Duration(TimeSpan.FromSeconds(0.1))
             };
 
             // Crear un Storyboard para la animación de salida
