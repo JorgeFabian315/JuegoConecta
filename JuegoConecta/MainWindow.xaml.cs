@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using System.Data.Common;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
@@ -29,7 +30,6 @@ namespace JuegoConecta
             CrearTablero(Columnas, Filas);
             nodoActual = new Nodo(new int[Filas,Columnas], JugadorActual);
         }
-
 
         public void CrearTablero(int columnas, int filas)
         {
@@ -62,24 +62,6 @@ namespace JuegoConecta
 
             for (int i = 0; i < columnas; i++)
             {
-                var borderColumna = new Border()
-                {
-
-                    Style = styleColumna,
-
-                };
-
-                if(i == 0)
-                    borderColumna.CornerRadius = new CornerRadius(10, 0, 0, 10);
-                else if (i == columnas - 1)
-                    borderColumna.CornerRadius = new CornerRadius(0, 10, 10, 0);
-
-
-                Grid.SetColumn(borderColumna, i);
-                Grid.SetRowSpan(borderColumna, filas);
-
-                tablero.Children.Add(borderColumna);
-
                 for (int j = 0; j < filas; j++)
                 {
                     var border = new Border()
@@ -88,7 +70,8 @@ namespace JuegoConecta
                         Width = 55,
                         Height = 55,
                         Background = Brushes.White,
-                        Tag = "ficha"
+                        Tag = "ficha",
+                       
                     };
 
                     Grid.SetColumn(border, i);
@@ -97,9 +80,27 @@ namespace JuegoConecta
 
                     tablero.Children.Add(border);
                 }
+
+                var borderColumna = new Border()
+                {
+
+                    Style = styleColumna,
+
+                };
+
+                if (i == 0)
+                    borderColumna.CornerRadius = new CornerRadius(20, 0, 0, 20);
+                else if (i == columnas - 1)
+                    borderColumna.CornerRadius = new CornerRadius(0, 20, 20, 0);
+
+
+                Grid.SetColumn(borderColumna, i);
+                Grid.SetRowSpan(borderColumna, filas);
+
+                tablero.Children.Add(borderColumna);
             }
         }
-
+ 
         private Style CrearEstiloColumnas()
         {
 
@@ -118,9 +119,8 @@ namespace JuegoConecta
 
             ColorAnimation colorAnimation = new ColorAnimation
             {
-                From = colorBlack,   // Color inicial
                 To = colorGris,     // Color final
-                Duration = new Duration(TimeSpan.FromSeconds(0.4)) // Duración de 0.4s
+                Duration = new Duration(TimeSpan.FromSeconds(0.3)) // Duración de 0.4s
             };
 
             // Crear un Storyboard y vincular la animación
@@ -133,8 +133,8 @@ namespace JuegoConecta
 
             ColorAnimation exitAnimation = new ColorAnimation
             {
-                To = colorBlack, // Volver al color original
-                Duration = new Duration(TimeSpan.FromSeconds(0.2))
+                To = Colors.Transparent, // Volver al color original
+                Duration = new Duration(TimeSpan.FromSeconds(0.1))
             };
 
             // Crear un Storyboard para la animación de salida
@@ -161,21 +161,23 @@ namespace JuegoConecta
             int column = (int)(clickPosition.X / (tablero.ActualWidth / Columnas));
             nodoActual.HacerMovimiento(nodoActual.Tablero, column, 1);
 
-
+            ColocarFicha(column);
+        }
+        private void ColocarFicha(int columna)
+        {
             var ultimaFicha = tablero.Children.OfType<Border>()
-                .Where(ficha => ficha.Background == Brushes.White
-                        && (string)ficha.Tag == "ficha"
-                        && Grid.GetColumn(ficha) == column)
-                .LastOrDefault();
+              .Where(ficha => ficha.Background == Brushes.White
+                      && (string)ficha.Tag == "ficha"
+                      && Grid.GetColumn(ficha) == columna)
+              .LastOrDefault();
 
-            SolidColorBrush color = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#DF474D")); // Naranja
-
+            SolidColorBrush color = new ((Color)ColorConverter.ConvertFromString("#DF474D")); // Naranja
 
             bool seguirJugando = tablero.Children.OfType<Border>()
-                .Any(ficha =>  (string)ficha.Tag == "ficha"
+                .Any(ficha => (string)ficha.Tag == "ficha"
                            && ficha.Background == Brushes.White);
 
-            if(!seguirJugando)
+            if (!seguirJugando)
             {
                 MessageBox.Show("Fin del juego");
                 CrearTablero(Columnas, Filas);
@@ -204,11 +206,16 @@ namespace JuegoConecta
             ultimaFicha.BorderBrush = Brushes.Black;
             ultimaFicha.BorderThickness = new Thickness(2);
             ultimaFicha.Background = color;
+<<<<<<< HEAD
             MovimientoMaquina();
         }
 
         private void MovimientoMaquina()
         {
+=======
+
+        }
+>>>>>>> 32aa731ea8de522608b1dec647488352bb70e0dd
 
             int column = nodoActual.ElegirMejorMovimiento().ColumnaMovimiento ;
             nodoActual.HacerMovimiento(nodoActual.Tablero, column, 2);
