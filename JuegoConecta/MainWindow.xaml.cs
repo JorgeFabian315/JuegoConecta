@@ -17,6 +17,8 @@ namespace JuegoConecta
     /// </summary>
     public partial class MainWindow : Window
     {
+        private Nodo nodoActual;
+       
         public int JugadorActual { get; set; } = 1;
         public int Filas { get; set; } = 6;
         public int Columnas { get; set; } = 7;
@@ -25,6 +27,7 @@ namespace JuegoConecta
             InitializeComponent();
 
             CrearTablero(Columnas, Filas);
+            nodoActual = new Nodo(new int[Filas,Columnas], JugadorActual);
         }
 
 
@@ -153,8 +156,10 @@ namespace JuegoConecta
 
         private void tablero_MouseDown(object sender, MouseButtonEventArgs e)
         {
+            //if(JugadorActual == 2) { return; }
             Point clickPosition = e.GetPosition(tablero);
             int column = (int)(clickPosition.X / (tablero.ActualWidth / Columnas));
+            nodoActual.HacerMovimiento(nodoActual.Tablero, column, 1);
 
 
             var ultimaFicha = tablero.Children.OfType<Border>()
@@ -199,9 +204,58 @@ namespace JuegoConecta
             ultimaFicha.BorderBrush = Brushes.Black;
             ultimaFicha.BorderThickness = new Thickness(2);
             ultimaFicha.Background = color;
+            MovimientoMaquina();
         }
 
+        private void MovimientoMaquina()
+        {
 
+            int column = nodoActual.ElegirMejorMovimiento().ColumnaMovimiento ;
+            nodoActual.HacerMovimiento(nodoActual.Tablero, column, 2);
+
+            var ultimaFicha = tablero.Children.OfType<Border>()
+                .Where(ficha => ficha.Background == Brushes.White
+                        && (string)ficha.Tag == "ficha"
+                        && Grid.GetColumn(ficha) == column)
+                .LastOrDefault();
+
+            SolidColorBrush color = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#DF474D")); // Naranja
+
+
+            bool seguirJugando = tablero.Children.OfType<Border>()
+                .Any(ficha => (string)ficha.Tag == "ficha"
+                           && ficha.Background == Brushes.White);
+
+            if (!seguirJugando)
+            {
+                MessageBox.Show("Fin del juego");
+                CrearTablero(Columnas, Filas);
+                JugadorActual = 1;
+                return;
+            }
+
+            if (ultimaFicha == null)
+                return;
+
+            if (JugadorActual == 1)
+            {
+                color = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#F7D100")); // Amarrillo
+                txtjugador.Text = "Jugador 2";
+                JugadorActual = 2;
+            }
+            else
+            {
+                txtjugador.Text = "Jugador 1";
+                JugadorActual = 1;
+            }
+
+            txtjugador.Foreground = color;
+
+
+            ultimaFicha.BorderBrush = Brushes.Black;
+            ultimaFicha.BorderThickness = new Thickness(2);
+            ultimaFicha.Background = color;
+        }
 
     }
 }

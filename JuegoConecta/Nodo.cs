@@ -15,7 +15,8 @@ namespace JuegoConecta
         public bool EsTerminal { get; set; }
         public int Filas { get; set; } = 6;
         public int Columnas { get; set; } = 7;
-        
+        public int ColumnaMovimiento { get; set; }
+
 
         public Nodo(int[,] tablero = null, int jugadorActual = 1)
         {
@@ -29,21 +30,40 @@ namespace JuegoConecta
 
         public void GenerarSucesores()
         {
+            //if (EsTerminal)
+            //    return;
+
+            //for (int col = 0; col < Columnas; col++)
+            //{
+            //    if (Tablero[0, col] == 0)
+            //    {
+            //        int[,] nuevoTablero = (int[,])Tablero.Clone();
+            //        HacerMovimiento(nuevoTablero, col, JugadorActual);
+            //        Hijos.Add(new Nodo(nuevoTablero, JugadorActual == 1 ? 2 : 1));
+            //    }
+            //}
             if (EsTerminal)
                 return;
 
             for (int col = 0; col < Columnas; col++)
             {
-                if (Tablero[0, col] == 0)
+                if (Tablero[0, col] == 0) // Verifica si la columna no está llena.
                 {
                     int[,] nuevoTablero = (int[,])Tablero.Clone();
                     HacerMovimiento(nuevoTablero, col, JugadorActual);
-                    Hijos.Add(new Nodo(nuevoTablero, JugadorActual == 1 ? 2 : 1));
+
+                    // Crea un nuevo nodo hijo, indicando la columna del movimiento.
+                    Nodo hijo = new Nodo(nuevoTablero, JugadorActual == 1 ? 2 : 1)
+                    {
+                        ColumnaMovimiento = col // Guarda la columna donde se realizó este movimiento.
+                    };
+
+                    Hijos.Add(hijo);
                 }
             }
         }
 
-        private void HacerMovimiento(int[,] tablero, int columna, int jugador)
+        public void HacerMovimiento(int[,] tablero, int columna, int jugador)
         {
             for (int fila = Filas - 1; fila >= 0; fila--)
             {
@@ -58,13 +78,13 @@ namespace JuegoConecta
         {
             return HayGanador() || TableroLleno();
         }
-        private bool HayGanador()
+        public bool HayGanador()
         {
             // Verifica filas, columnas y diagonales para encontrar 5 fichas consecutivas.
             return VerificarLineas(5);
         }
 
-        private bool TableroLleno()
+        public bool TableroLleno()
         {
             for (int col = 0; col < Columnas; col++)
             {
@@ -75,7 +95,7 @@ namespace JuegoConecta
         }
 
        
-        private bool VerificarLineas(int cantidad)
+        bool VerificarLineas(int cantidad)
         {
            //filas
             for (int fila = 0; fila < Filas; fila++)
@@ -135,17 +155,12 @@ namespace JuegoConecta
         }
 
         #region Minimax
-        /// <summary>
-        /// Implementa el algoritmo Minimax.
-        /// </summary>
-        /// <param name="profundidad">La profundidad máxima de búsqueda.</param>
-        /// <param name="maximizando">Indica si estamos maximizando o minimizando.</param>
-        /// <returns>El valor del nodo.</returns>
+        
         public int Minimax(int profundidadBusqueda, bool maximizando)
         {
             if (EsTerminal || profundidadBusqueda == 0)
             {
-                return CalcularHeuristica();
+                return Heuristica();
             }
 
             if (maximizando)
@@ -177,8 +192,9 @@ namespace JuegoConecta
                 return mejorValor;
             }
         }
+        
 
-        private int CalcularHeuristica()
+        public int Heuristica()
         {
             if (HayGanador())
             {
@@ -295,7 +311,7 @@ namespace JuegoConecta
 
             foreach (var hijo in Hijos)
             {
-                int valor = hijo.Minimax(5, false); // Profundidad máxima de 5.
+                int valor = hijo.Minimax(2, false); // Profundidad máxima de 5.
                 if (valor > mejorValor)
                 {
                     mejorValor = valor;
@@ -306,6 +322,7 @@ namespace JuegoConecta
             return mejorMovimiento;
         }
         #endregion
+
     }
 
 }
